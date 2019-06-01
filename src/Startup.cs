@@ -53,7 +53,6 @@ namespace DotNetSignalR
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
-            // This should be below any http
             app.UseSignalR(routes =>
             {
                 routes.MapHub<ChatHub>("/chatHub");
