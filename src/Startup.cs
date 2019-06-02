@@ -53,6 +53,14 @@ namespace DotNetSignalR
             app.UseStaticFiles();
             app.UseCookiePolicy();
 
+            app.UseCors(builder =>
+            {
+                builder.WithOrigins("https://www.yourwebsite.com")
+                .AllowAnyHeader()
+                .WithMethods("GET", "POST")
+                .AllowCredentials();
+            });
+
             app.UseSignalR(routes =>
             {
                 routes.MapHub<ChatHub>("/chatHub");
