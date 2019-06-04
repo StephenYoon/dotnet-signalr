@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DotNetSignalR.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -33,6 +34,8 @@ namespace DotNetSignalR
 
             services.AddSignalR();
 
+            services.AddSingleton<IChatRoomService, InMemoryChatRoomService>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -52,14 +55,6 @@ namespace DotNetSignalR
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins("https://www.yourwebsite.com")
-                .AllowAnyHeader()
-                .WithMethods("GET", "POST")
-                .AllowCredentials();
-            });
 
             app.UseSignalR(routes =>
             {

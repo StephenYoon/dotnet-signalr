@@ -1,4 +1,5 @@
 ﻿using DotNetSignalR.Models;
+using DotNetSignalR.Services;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,21 @@ namespace DotNetSignalR
 {
     public class ChatHub : Hub
     {
+        private readonly IChatRoomService _chatRoomService;
+
+        public ChatHub(IChatRoomService chatRoomService)
+        {
+            _chatRoomService = chatRoomService;
+        }
+
         public override async Task OnConnectedAsync()
         {
+            var roomId = await _chatRoomService.CreateRoom(
+                Context.ConnectionId);
+
+            await Groups.AddToGroupAsync(
+                Context.ConnectionId, roomId.ToString());
+
             await Clients.Caller.SendAsync(
                 "ReceiveMessage",
                 "Explore California",
@@ -22,6 +36,9 @@ namespace DotNetSignalR
 
         public async Task SendMessage(string name, string text)
         {
+            var roomId = await _chatRoomService.GetRoomForConnectionId(
+                Context.ConnectionId);
+
             var message = new ChatMessage
             {
                 SenderName = name,
@@ -30,7 +47,7 @@ namespace DotNetSignalR
             };
 
             // Broadcast to all clients
-            await Clients.All.SendAsync(
+            await Clients.Group(roomId.ToString()).SendAsync(
                 "ReceiveMessage",
                 message.SenderName,
                 message.SentAt,
