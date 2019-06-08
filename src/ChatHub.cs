@@ -54,5 +54,15 @@ namespace DotNetSignalR
                 message.Text);
 
         }
+
+        public async Task SetName(string visitorName)
+        {
+            var roomName = $"Chat with {visitorName} from the web";
+
+            var roomId = await _chatRoomService.GetRoomForConnectionId(
+                Context.ConnectionId);
+
+            await _chatRoomService.SetRoomName(roomId, roomName);
+        }
     }
 }
