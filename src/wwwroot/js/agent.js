@@ -1,4 +1,4 @@
-﻿﻿var activeRoomId = '';
+﻿var activeRoomId = '';
 
 var agentConnection = new signalR.HubConnectionBuilder()
     .withUrl('/agentHub')
@@ -27,6 +27,7 @@ chatConnection.onclose(function () {
 });
 
 chatConnection.on('ReceiveMessage', addMessage);
+agentConnection.on('ReceiveMessages', addMessages);
 
 function startChatConnection() {
     chatConnection
@@ -43,7 +44,7 @@ function handleDisconnected(retryFunc) {
 
 function sendMessage(text) {
     if (text && text.length) {
-        // TODO: Send an agent message
+        agentConnection.invoke('SendAgentMessage', activeRoomId, text);
     }
 }
 
@@ -74,7 +75,7 @@ function switchActiveRoomTo(id) {
     if (!id) return;
 
     chatConnection.invoke('JoinRoom', activeRoomId);
-    // TODO: Load the room history
+    agentConnection.invoke('LoadHistory', activeRoomId);
 }
 
 
